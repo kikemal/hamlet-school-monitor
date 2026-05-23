@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../behaviour/presentation/providers/behaviour_providers.dart';
+import '../../../behaviour/presentation/widgets/behaviour_summary_chip.dart';
 import '../providers/parent_providers.dart';
 import '../widgets/parent_error_view.dart';
 import '../widgets/parent_loading_view.dart';
@@ -16,6 +18,7 @@ class ParentChildProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(childProfileProvider);
+    final behaviourSummary = ref.watch(childBehaviourSummaryProvider);
 
     return profileAsync.when(
       loading: () => const ParentLoadingView(),
@@ -127,6 +130,15 @@ class ParentChildProfileScreen extends ConsumerWidget {
                                   : AppColors.error,
                             ),
                           ],
+                        ),
+                        SizedBox(height: 16.h),
+                        behaviourSummary.when(
+                          loading: () => const SizedBox.shrink(),
+                          error: (_, __) => const SizedBox.shrink(),
+                          data: (summary) => Align(
+                            alignment: Alignment.centerLeft,
+                            child: BehaviourSummaryChip(summary: summary),
+                          ),
                         ),
                       ],
                     ),

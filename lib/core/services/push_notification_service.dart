@@ -79,6 +79,10 @@ class PushNotificationService {
     }
   }
 
+  /// Shows a local notification immediately (e.g. from Realtime callbacks).
+  Future<void> showLocal({required String title, required String body}) =>
+      _showNotification(title, body);
+
   /// Shows the local notification
   Future<void> _showNotification(String title, String body) async {
     try {

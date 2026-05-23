@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../behaviour/presentation/providers/behaviour_providers.dart';
+import '../../../behaviour/presentation/widgets/behaviour_summary_chip.dart';
 import '../providers/student_providers.dart';
 import '../widgets/student_error_view.dart';
 import '../widgets/student_loading_view.dart';
@@ -15,6 +17,7 @@ class StudentProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(studentProfileProvider);
+    final behaviourSummary = ref.watch(studentBehaviourSummaryProvider);
 
     return profileAsync.when(
       loading: () => const StudentLoadingView(),
@@ -112,6 +115,17 @@ class StudentProfileScreen extends ConsumerWidget {
                           ],
                         ),
                         SizedBox(height: 24.h),
+                        behaviourSummary.when(
+                          loading: () => const SizedBox.shrink(),
+                          error: (_, __) => const SizedBox.shrink(),
+                          data: (summary) => Padding(
+                            padding: EdgeInsets.only(bottom: 16.h),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: BehaviourSummaryChip(summary: summary),
+                            ),
+                          ),
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -120,8 +134,8 @@ class StudentProfileScreen extends ConsumerWidget {
                               student.rollNumber ?? 'Not set',
                             ),
                             _buildStat(
-                              'Class Teacher',
-                              'Loading...', // This would come from a separate provider in a full implementation
+                              'Class',
+                              student.schoolClasses?.name ?? 'Unassigned',
                             ),
                           ],
                         ),

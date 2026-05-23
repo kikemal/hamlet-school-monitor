@@ -180,33 +180,23 @@ class ParentChildService extends ParentServiceBase {
     try {
       final response = await SupabaseConfig.client
           .from('behaviour_logs')
-          .select('''
-            id,
-            student_id,
-            teacher_id,
-            incident_type,
-            description,
-            date,
-            profiles!inner(
-              first_name,
-              last_name
-            )
-          ''')
+          .select(
+            '*, teachers!inner(profiles(first_name, last_name))',
+          )
           .eq('student_id', studentId)
           .order('date', ascending: false)
-          .limit(20);
+          .limit(50);
 
-      final logs = <BehaviourLogWithTeacher>[];
-      for (final row in response) {
-        final profile = row['profiles'] as Map<String, dynamic>;
-
-        logs.add(BehaviourLogWithTeacher(
-          log: BehaviourLog.fromJson(row),
-          teacherName: '${profile['first_name']} ${profile['last_name']}',
-        ));
-      }
-
-      return logs;
+      return response.map((row) {
+        final map = Map<String, dynamic>.from(row);
+        final teacher = map['teachers'] as Map;
+        final profile = teacher['profiles'] as Map;
+        return BehaviourLogWithTeacher(
+          log: BehaviourLog.fromJson(map),
+          teacherName:
+              '${profile['first_name']} ${profile['last_name']}'.trim(),
+        );
+      }).toList();
     } catch (e) {
       throw Exception('Failed to fetch behaviour logs: $e');
     }

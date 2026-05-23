@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BehaviourLog {
 
- String get id; String get studentId; String get teacherId; String get incidentType; String get description; DateTime get date;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
+ String get id; String get studentId; String get teacherId; String get incidentType; String get description; String? get severity; DateTime get date;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
 /// Create a copy of BehaviourLog
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $BehaviourLogCopyWith<BehaviourLog> get copyWith => _$BehaviourLogCopyWithImpl<B
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BehaviourLog&&(identical(other.id, id) || other.id == id)&&(identical(other.studentId, studentId) || other.studentId == studentId)&&(identical(other.teacherId, teacherId) || other.teacherId == teacherId)&&(identical(other.incidentType, incidentType) || other.incidentType == incidentType)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BehaviourLog&&(identical(other.id, id) || other.id == id)&&(identical(other.studentId, studentId) || other.studentId == studentId)&&(identical(other.teacherId, teacherId) || other.teacherId == teacherId)&&(identical(other.incidentType, incidentType) || other.incidentType == incidentType)&&(identical(other.description, description) || other.description == description)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,studentId,teacherId,incidentType,description,date,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,studentId,teacherId,incidentType,description,severity,date,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'BehaviourLog(id: $id, studentId: $studentId, teacherId: $teacherId, incidentType: $incidentType, description: $description, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'BehaviourLog(id: $id, studentId: $studentId, teacherId: $teacherId, incidentType: $incidentType, description: $description, severity: $severity, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $BehaviourLogCopyWith<$Res>  {
   factory $BehaviourLogCopyWith(BehaviourLog value, $Res Function(BehaviourLog) _then) = _$BehaviourLogCopyWithImpl;
 @useResult
 $Res call({
- String id, String studentId, String teacherId, String incidentType, String description, DateTime date,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+ String id, String studentId, String teacherId, String incidentType, String description, String? severity, DateTime date,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -65,14 +65,15 @@ class _$BehaviourLogCopyWithImpl<$Res>
 
 /// Create a copy of BehaviourLog
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? studentId = null,Object? teacherId = null,Object? incidentType = null,Object? description = null,Object? date = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? studentId = null,Object? teacherId = null,Object? incidentType = null,Object? description = null,Object? severity = freezed,Object? date = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,studentId: null == studentId ? _self.studentId : studentId // ignore: cast_nullable_to_non_nullable
 as String,teacherId: null == teacherId ? _self.teacherId : teacherId // ignore: cast_nullable_to_non_nullable
 as String,incidentType: null == incidentType ? _self.incidentType : incidentType // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,severity: freezed == severity ? _self.severity : severity // ignore: cast_nullable_to_non_nullable
+as String?,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -216,7 +217,7 @@ return $default(_that.id,_that.studentId,_that.teacherId,_that.incidentType,_tha
 @JsonSerializable()
 
 class _BehaviourLog implements BehaviourLog {
-  const _BehaviourLog({required this.id, required this.studentId, required this.teacherId, required this.incidentType, required this.description, required this.date, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt});
+  const _BehaviourLog({required this.id, required this.studentId, required this.teacherId, required this.incidentType, required this.description, this.severity, required this.date, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt});
   factory _BehaviourLog.fromJson(Map<String, dynamic> json) => _$BehaviourLogFromJson(json);
 
 @override final  String id;
@@ -224,6 +225,7 @@ class _BehaviourLog implements BehaviourLog {
 @override final  String teacherId;
 @override final  String incidentType;
 @override final  String description;
+@override final  String? severity;
 @override final  DateTime date;
 @override@JsonKey(name: 'created_at') final  DateTime? createdAt;
 @override@JsonKey(name: 'updated_at') final  DateTime? updatedAt;
@@ -241,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BehaviourLog&&(identical(other.id, id) || other.id == id)&&(identical(other.studentId, studentId) || other.studentId == studentId)&&(identical(other.teacherId, teacherId) || other.teacherId == teacherId)&&(identical(other.incidentType, incidentType) || other.incidentType == incidentType)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BehaviourLog&&(identical(other.id, id) || other.id == id)&&(identical(other.studentId, studentId) || other.studentId == studentId)&&(identical(other.teacherId, teacherId) || other.teacherId == teacherId)&&(identical(other.incidentType, incidentType) || other.incidentType == incidentType)&&(identical(other.description, description) || other.description == description)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.date, date) || other.date == date)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,studentId,teacherId,incidentType,description,date,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,studentId,teacherId,incidentType,description,severity,date,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'BehaviourLog(id: $id, studentId: $studentId, teacherId: $teacherId, incidentType: $incidentType, description: $description, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'BehaviourLog(id: $id, studentId: $studentId, teacherId: $teacherId, incidentType: $incidentType, description: $description, severity: $severity, date: $date, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$BehaviourLogCopyWith<$Res> implements $BehaviourLogCopyWi
   factory _$BehaviourLogCopyWith(_BehaviourLog value, $Res Function(_BehaviourLog) _then) = __$BehaviourLogCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String studentId, String teacherId, String incidentType, String description, DateTime date,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+ String id, String studentId, String teacherId, String incidentType, String description, String? severity, DateTime date,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -278,14 +280,15 @@ class __$BehaviourLogCopyWithImpl<$Res>
 
 /// Create a copy of BehaviourLog
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? studentId = null,Object? teacherId = null,Object? incidentType = null,Object? description = null,Object? date = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? studentId = null,Object? teacherId = null,Object? incidentType = null,Object? description = null,Object? severity = freezed,Object? date = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_BehaviourLog(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,studentId: null == studentId ? _self.studentId : studentId // ignore: cast_nullable_to_non_nullable
 as String,teacherId: null == teacherId ? _self.teacherId : teacherId // ignore: cast_nullable_to_non_nullable
 as String,incidentType: null == incidentType ? _self.incidentType : incidentType // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,severity: freezed == severity ? _self.severity : severity // ignore: cast_nullable_to_non_nullable
+as String?,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,

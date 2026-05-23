@@ -1,3 +1,4 @@
+import '../../../behaviour/domain/models/behaviour_models.dart';
 import '../../../shared/domain/entities/announcement.dart';
 import '../../../shared/domain/entities/behaviour_log.dart';
 import 'dart:typed_data';
@@ -154,7 +155,7 @@ class TeacherRepository {
         gradedMarks: gradedMarks,
       );
 
-  Future<List<TeacherBehaviourItem>> fetchBehaviourForClass(String classId) =>
+  Future<List<BehaviourLogDisplayItem>> fetchBehaviourForClass(String classId) =>
       _behaviour.fetchForClass(classId);
 
   Future<BehaviourLog> createBehaviourLog({

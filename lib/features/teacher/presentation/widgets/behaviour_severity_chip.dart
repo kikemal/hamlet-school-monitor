@@ -8,9 +8,10 @@ class BehaviourSeverityChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (severity.toLowerCase()) {
-      'low' => (Colors.green, 'Low'),
-      'high' => (Colors.red, 'High'),
-      _ => (Colors.orange, 'Medium'),
+      'minor' || 'low' => (Colors.amber, 'Minor'),
+      'serious' || 'high' => (Colors.red, 'Serious'),
+      'moderate' || 'medium' => (Colors.orange, 'Moderate'),
+      _ => (Colors.orange, 'Moderate'),
     };
 
     return Chip(

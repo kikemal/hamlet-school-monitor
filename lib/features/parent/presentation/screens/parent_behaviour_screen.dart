@@ -4,6 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../behaviour/domain/models/behaviour_models.dart';
+import '../../../behaviour/presentation/providers/behaviour_providers.dart';
+import '../../../behaviour/presentation/widgets/behaviour_log_card.dart';
 import '../../domain/models/parent_models.dart';
 import '../providers/parent_providers.dart';
 import '../widgets/parent_error_view.dart';
@@ -16,13 +19,48 @@ class ParentBehaviourScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final behaviourAsync = ref.watch(childBehaviourProvider);
+    final summaryAsync = ref.watch(childBehaviourSummaryProvider);
 
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
           child: ParentPageHeader(
             title: 'Behaviour Log',
-            subtitle: 'View discipline records',
+            subtitle: 'Discipline records for your child',
+          ),
+        ),
+        summaryAsync.when(
+          loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+          error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+          data: (summary) => SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(20.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _SummaryStat(
+                        label: 'Minor',
+                        value: '${summary.minor}',
+                        color: Colors.amber,
+                      ),
+                      _SummaryStat(
+                        label: 'Moderate',
+                        value: '${summary.moderate}',
+                        color: Colors.orange,
+                      ),
+                      _SummaryStat(
+                        label: 'Serious',
+                        value: '${summary.serious}',
+                        color: AppColors.error,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
         behaviourAsync.when(
@@ -48,71 +86,28 @@ class ParentBehaviourScreen extends ConsumerWidget {
               );
             }
 
-            final positiveCount = logs.where((l) => l.isPositive).length;
+            final items = logs
+                .map(
+                  (l) => BehaviourLogDisplayItem.fromLog(
+                    l.log,
+                    teacherName: l.teacherName,
+                  ),
+                )
+                .toList();
 
             return SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(20.w),
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(20.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  '$positiveCount',
-                                  style: AppTypography.h2.copyWith(
-                                    color: AppColors.success,
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  'Positive',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  '${logs.length - positiveCount}',
-                                  style: AppTypography.h2.copyWith(
-                                    color: AppColors.error,
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  'Incidents',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.w),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: items.length,
+                  itemBuilder: (_, i) => BehaviourLogCard(
+                    item: items[i],
+                    showStudentName: false,
+                    showTeacherName: true,
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: logs.length,
-                      itemBuilder: (context, index) {
-                        final log = logs[index];
-                        return _buildBehaviourCard(context, log);
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
             );
           },
@@ -120,78 +115,32 @@ class ParentBehaviourScreen extends ConsumerWidget {
       ],
     );
   }
+}
 
-  Widget _buildBehaviourCard(BuildContext context, BehaviourLogWithTeacher log) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isPositive = log.isPositive;
+class _SummaryStat extends StatelessWidget {
+  const _SummaryStat({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
-    return Card(
-      margin: EdgeInsets.only(bottom: 12.h),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(12.w),
-                  decoration: BoxDecoration(
-                    color: isPositive
-                        ? AppColors.success.withOpacity(0.1)
-                        : AppColors.error.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Icon(
-                    isPositive ? Icons.star : Icons.warning,
-                    color: isPositive ? AppColors.success : AppColors.error,
-                    size: 24.w,
-                  ),
-                ),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        log.log.incidentType,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        '${log.log.date.day}/${log.log.date.month}/${log.log.date.year}',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              log.log.description,
-              style: AppTypography.bodyMedium.copyWith(
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondaryLight,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'Reported by: ${log.teacherName}',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-          ],
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value, style: AppTypography.h2.copyWith(color: color)),
+        SizedBox(height: 4.h),
+        Text(
+          label,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
         ),
-      ),
+      ],
     );
   }
 }

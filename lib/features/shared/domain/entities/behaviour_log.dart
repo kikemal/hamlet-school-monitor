@@ -11,6 +11,7 @@ abstract class BehaviourLog with _$BehaviourLog {
     required String teacherId,
     required String incidentType,
     required String description,
+    String? severity,
     required DateTime date,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,

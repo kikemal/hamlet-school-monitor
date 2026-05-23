@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../behaviour/domain/models/behaviour_models.dart';
 import '../../domain/models/parent_models.dart';
 
 class ParentChildCard extends StatelessWidget {
@@ -12,11 +13,13 @@ class ParentChildCard extends StatelessWidget {
     required this.child,
     required this.onTap,
     this.isSelected = false,
+    this.behaviourSummary,
   });
 
   final ChildSummary child;
   final VoidCallback onTap;
   final bool isSelected;
+  final BehaviourSummary? behaviourSummary;
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +120,17 @@ class ParentChildCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (behaviourSummary != null && behaviourSummary!.total > 0) ...[
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Behaviour: ${behaviourSummary!.headline}',
+                      style: AppTypography.caption.copyWith(
+                        color: behaviourSummary!.serious > 0
+                            ? AppColors.error
+                            : AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

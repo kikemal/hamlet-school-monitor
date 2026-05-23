@@ -21,6 +21,7 @@ class AdminShellScreen extends ConsumerWidget {
     (icon: Icons.event_outlined, label: 'Calendar', route: AppConstants.routeAdminEvents),
     (icon: Icons.folder_outlined, label: 'Documents', route: AppConstants.routeAdminDocuments),
     (icon: Icons.insights_outlined, label: 'Analytics', route: AppConstants.routeAdminAnalytics),
+    (icon: Icons.shield_outlined, label: 'Behaviour', route: AppConstants.routeAdminBehaviour),
     (icon: Icons.download_outlined, label: 'Export', route: AppConstants.routeAdminExports),
   ];
 

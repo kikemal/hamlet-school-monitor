@@ -8,6 +8,7 @@ import 'core/services/push_notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/startup_error_app.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
+import 'features/behaviour/presentation/providers/behaviour_providers.dart';
 import 'features/homework/presentation/providers/homework_realtime_provider.dart';
 import 'router/router.dart';
 
@@ -48,6 +49,7 @@ class HamletSchoolApp extends ConsumerWidget {
 
     ref.watch(studentHomeworkRealtimeProvider);
     ref.watch(parentHomeworkRealtimeProvider);
+    ref.watch(parentBehaviourRealtimeProvider);
 
     // Reactively listen to authentication state changes to subscribe/unsubscribe to push notifications
     ref.listen(authProvider, (previous, next) {

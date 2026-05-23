@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../admin/presentation/widgets/admin_validated_field.dart';
+import '../../../behaviour/domain/models/behaviour_models.dart';
+import '../../../behaviour/presentation/widgets/behaviour_log_card.dart';
 import '../../../../core/utils/app_validator.dart';
-import '../../domain/models/teacher_models.dart';
 import '../providers/teacher_providers.dart';
-import '../widgets/behaviour_log_card.dart';
 import '../widgets/teacher_class_selector.dart';
 import '../widgets/teacher_empty_state.dart';
 import '../widgets/teacher_page_header.dart';
@@ -19,7 +19,7 @@ class TeacherBehaviourScreen extends ConsumerStatefulWidget {
 }
 
 class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen> {
-  List<TeacherBehaviourItem> _logs = [];
+  List<BehaviourLogDisplayItem> _logs = [];
   bool _loading = false;
 
   @override
@@ -33,8 +33,9 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
     if (classId == null) return;
     setState(() => _loading = true);
     try {
-      final logs =
-          await ref.read(teacherRepositoryProvider).fetchBehaviourForClass(classId);
+      final logs = await ref
+          .read(teacherRepositoryProvider)
+          .fetchBehaviourForClass(classId);
       if (mounted) setState(() => _logs = logs);
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -52,8 +53,8 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
 
     String? studentId = students.first.id;
     var incidentType = 'negative';
-    var severity = 'medium';
-    final notesCtrl = TextEditingController();
+    var severity = 'moderate';
+    final descCtrl = TextEditingController();
     var date = DateTime.now();
 
     if (!mounted) return;
@@ -63,7 +64,7 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
         final formKey = GlobalKey<FormState>();
         return StatefulBuilder(
           builder: (context, setDialogState) => AlertDialog(
-            title: const Text('Log behaviour incident'),
+            title: const Text('Log discipline incident'),
             content: SingleChildScrollView(
               child: Form(
                 key: formKey,
@@ -96,11 +97,11 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
                       items: const [
                         DropdownMenuItem(
                           value: 'positive',
-                          child: Text('Positive'),
+                          child: Text('Positive recognition'),
                         ),
                         DropdownMenuItem(
                           value: 'negative',
-                          child: Text('Negative'),
+                          child: Text('Discipline incident'),
                         ),
                       ],
                       onChanged: (v) {
@@ -115,9 +116,15 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
                         border: OutlineInputBorder(),
                       ),
                       items: const [
-                        DropdownMenuItem(value: 'low', child: Text('Low')),
-                        DropdownMenuItem(value: 'medium', child: Text('Medium')),
-                        DropdownMenuItem(value: 'high', child: Text('High')),
+                        DropdownMenuItem(value: 'minor', child: Text('Minor')),
+                        DropdownMenuItem(
+                          value: 'moderate',
+                          child: Text('Moderate'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'serious',
+                          child: Text('Serious'),
+                        ),
                       ],
                       onChanged: (v) {
                         if (v != null) setDialogState(() => severity = v);
@@ -125,10 +132,11 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
                     ),
                     const SizedBox(height: 12),
                     AdminValidatedField(
-                      controller: notesCtrl,
-                      label: 'Notes',
+                      controller: descCtrl,
+                      label: 'Description',
                       maxLines: 4,
-                      validator: (v) => AppValidator.validateRequired(v, 'Notes'),
+                      validator: (v) =>
+                          AppValidator.validateRequired(v, 'Description'),
                     ),
                     ListTile(
                       contentPadding: EdgeInsets.zero,
@@ -170,7 +178,7 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
     );
 
     if (ok != true || studentId == null) {
-      notesCtrl.dispose();
+      descCtrl.dispose();
       return;
     }
 
@@ -180,13 +188,13 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
             teacherId: teacherId,
             incidentType: incidentType,
             severity: severity,
-            notes: notesCtrl.text.trim(),
+            notes: descCtrl.text.trim(),
             date: date,
           );
       await _load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Incident logged')),
+          const SnackBar(content: Text('Incident logged — parent notified')),
         );
       }
     } catch (e) {
@@ -196,7 +204,7 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
         );
       }
     } finally {
-      notesCtrl.dispose();
+      descCtrl.dispose();
     }
   }
 
@@ -208,7 +216,7 @@ class _TeacherBehaviourScreenState extends ConsumerState<TeacherBehaviourScreen>
       children: [
         TeacherPageHeader(
           title: 'Behaviour log',
-          subtitle: 'Discipline and positive recognition',
+          subtitle: 'Log incidents with minor, moderate, or serious severity',
           action: FilledButton.icon(
             onPressed: _logIncident,
             icon: const Icon(Icons.add),

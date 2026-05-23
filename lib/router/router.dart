@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/constants.dart';
+import '../features/admin/presentation/screens/admin_behaviour_screen.dart';
 import '../features/admin/presentation/screens/admin_analytics_screen.dart';
 import '../features/admin/presentation/screens/admin_classes_screen.dart';
 import '../features/admin/presentation/screens/admin_dashboard_screen.dart';
@@ -11,7 +12,7 @@ import '../features/admin/presentation/screens/admin_events_screen.dart';
 import '../features/admin/presentation/screens/admin_exports_screen.dart';
 import '../features/admin/presentation/screens/admin_fees_screen.dart';
 import '../features/admin/presentation/screens/admin_parents_screen.dart';
-import '../features/admin/presentation/screens/admin_shell_screen.dart';
+import '../features/teacher/admin/presentation/screens/admin_shell_screen.dart';
 import '../features/admin/presentation/screens/admin_students_screen.dart';
 import '../features/admin/presentation/screens/admin_teachers_screen.dart';
 import '../features/auth/presentation/guards/role_guard.dart';
@@ -121,6 +122,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           _adminBranch(AppConstants.routeAdminEvents, const AdminEventsScreen()),
           _adminBranch(AppConstants.routeAdminDocuments, const AdminDocumentsScreen()),
           _adminBranch(AppConstants.routeAdminAnalytics, const AdminAnalyticsScreen()),
+          _adminBranch(AppConstants.routeAdminBehaviour, const AdminBehaviourScreen()),
           _adminBranch(AppConstants.routeAdminExports, const AdminExportsScreen()),
         ],
       ),
