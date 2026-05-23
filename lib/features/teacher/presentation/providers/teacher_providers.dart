@@ -3,9 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/repositories/teacher_repository.dart';
 import '../../domain/models/teacher_models.dart';
+import '../../../features/attendance/domain/models/attendance_models.dart';
+import '../../../features/attendance/data/repositories/attendance_repository.dart';
 
 final teacherRepositoryProvider = Provider<TeacherRepository>((ref) {
   return TeacherRepository();
+});
+
+final attendanceRepositoryProvider = Provider<AttendanceRepository>((ref) {
+  return AttendanceRepository();
 });
 
 final teacherIdProvider = Provider<String?>((ref) {
@@ -103,10 +109,42 @@ final teacherAttendanceTrendProvider = FutureProvider.autoDispose
   return ref.read(teacherRepositoryProvider).fetchAttendanceTrend(classId);
 });
 
+// Attendance providers
+final teacherAttendanceSheetProvider = FutureProvider.family
+    .autoDispose<List<AttendanceRecord>, String>((ref, classId) {
+  final date = ref.watch(attendanceDateProvider);
+  return ref
+      .read(attendanceRepositoryProvider)
+      .fetchAttendanceSheet(classId: classId, date: date);
+});
+
+final attendanceDateProvider = StateProvider<DateTime>((ref) {
+  return DateTime.now(); // Default to today
+});
+
+final teacherMonthlyAttendanceProvider = FutureProvider.family
+    .autoDispose<List<MonthlyAttendanceSummary>, int>((ref, months) {
+  final classId = ref.watch(teacherSelectedClassIdProvider);
+  if (classId == null) return [];
+  return ref
+      .read(attendanceRepositoryProvider)
+      .fetchMonthlyAttendance(classId, months: months);
+});
+
+final teacherClassAttendanceComparisonProvider =
+    FutureProvider.autoDispose<List<ClassAttendanceComparison>>((ref) {
+  final classIds = ref.watch(teacherClassIdsProvider);
+  if (classIds.isEmpty) return [];
+  return ref
+      .read(attendanceRepositoryProvider)
+      .fetchClassAttendanceComparison(classIds);
+});
+
 void teacherInvalidateAll(WidgetRef ref) {
   ref.invalidate(teacherAssignedClassesProvider);
   ref.invalidate(teacherDashboardStatsProvider);
   ref.invalidate(teacherTimetableProvider);
   ref.invalidate(teacherHomeworkProvider);
   ref.invalidate(teacherClassAnalyticsProvider);
+  ref.invalidate(attendanceDateProvider);
 }

@@ -37,6 +37,7 @@ class AppConstants {
   static const String routeTeacherBehaviour = '/teacher/behaviour';
   static const String routeTeacherAnnouncements = '/teacher/announcements';
   static const String routeTeacherAnalytics = '/teacher/analytics';
+static const String routeTeacherAttendanceAnalytics = '/teacher/attendance-analytics';
   static const String routeParentDashboard = '/parent/dashboard';
   static const String routeParentProfile = '/parent/profile';
   static const String routeParentCalendar = '/parent/calendar';

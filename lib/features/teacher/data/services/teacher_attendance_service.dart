@@ -1,6 +1,7 @@
 import '../../../shared/domain/entities/attendance.dart';
 import '../../domain/models/teacher_models.dart';
 import 'teacher_service_base.dart';
+import '../../../../core/network/supabase_config.dart';
 
 class TeacherAttendanceService extends TeacherServiceBase {
   Future<List<TeacherAttendanceRow>> fetchAttendanceSheet({
@@ -57,6 +58,8 @@ class TeacherAttendanceService extends TeacherServiceBase {
     required List<TeacherAttendanceRow> rows,
   }) async {
     final dateStr = _dateOnly(date);
+    final absentStudentIds = <String>[];
+
     for (final row in rows) {
       final payload = {
         'student_id': row.student.id,
@@ -75,6 +78,53 @@ class TeacherAttendanceService extends TeacherServiceBase {
       } else {
         await supabaseClient.from('attendance').insert(payload);
       }
+
+      // Collect absent student IDs for notifications
+      if (row.status == 'absent') {
+        absentStudentIds.add(row.student.id);
+      }
+    }
+
+    // Send notifications for absent students
+    if (absentStudentIds.isNotEmpty) {
+      await _sendAbsenceNotifications(absentStudentIds, date);
+    }
+  }
+
+  Future<void> _sendAbsenceNotifications(List<String> studentIds, DateTime date) async {
+    try {
+      // Fetch parent IDs and student names for the absent students
+      final studentResponse = await supabaseClient
+          .from('students')
+          .select('id, profiles!inner(first_name, last_name), parent_id')
+          .in_('id', studentIds);
+
+      final notificationsToInsert = <Map<String, dynamic>>[];
+      final dateString = '${date.day}/${date.month}/${date.year}';
+
+      for (final student in studentResponse) {
+        final parentId = student['parent_id'] as String?;
+        final firstName = student['profiles']['first_name'] as String?;
+        final lastName = student['profiles']['last_name'] as String?;
+        final studentName = '$firstName $lastName'?.trim() ?? 'Student';
+
+        if (parentId != null) {
+          notificationsToInsert.add({
+            'user_id': parentId,
+            'title': 'Attendance Alert',
+            'body': 'Your child $studentName was marked absent on $dateString.',
+            'is_read': false,
+          });
+        }
+      }
+
+      // Insert notifications
+      if (notificationsToInsert.isNotEmpty) {
+        await supabaseClient.from('notifications').insert(notificationsToInsert);
+      }
+    } catch (e) {
+      // Log error but don't fail the attendance saving
+      print('Failed to send absence notifications: $e');
     }
   }
 

@@ -197,10 +197,14 @@ final routerProvider = Provider<GoRouter>((ref) {
              AppConstants.routeTeacherAnnouncements,
              const TeacherAnnouncementsScreen(),
            ),
-           _teacherBranch(
-             AppConstants.routeTeacherAnalytics,
-             const TeacherAnalyticsScreen(),
-           ),
+            _teacherBranch(
+              AppConstants.routeTeacherAnalytics,
+              const TeacherAnalyticsScreen(),
+            ),
+            _teacherBranch(
+              AppConstants.routeTeacherAttendanceAnalytics,
+              const TeacherAttendanceAnalyticsScreen(),
+            ),
          ],
        ),
        StatefulShellRoute.indexedStack(
