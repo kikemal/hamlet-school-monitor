@@ -4,8 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/constants/constants.dart';
 import 'core/network/supabase_config.dart';
+import 'core/services/push_notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/startup_error_app.dart';
+import 'features/auth/presentation/providers/auth_provider.dart';
 import 'router/router.dart';
 
 Future<void> main() async {
@@ -18,6 +20,7 @@ Future<void> main() async {
 
   try {
     await SupabaseConfig.initialize();
+    await PushNotificationService.instance.initialize();
   } catch (e) {
     runApp(
       StartupErrorApp(
@@ -41,6 +44,15 @@ class HamletSchoolApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final goRouter = ref.watch(routerProvider);
+
+    // Reactively listen to authentication state changes to subscribe/unsubscribe to push notifications
+    ref.listen(authProvider, (previous, next) {
+      if (next.isAuthenticated && next.profile != null) {
+        PushNotificationService.instance.subscribeToUserNotifications(next.profile!.id);
+      } else {
+        PushNotificationService.instance.unsubscribe();
+      }
+    });
 
     return ScreenUtilInit(
       designSize: const Size(390, 844),
