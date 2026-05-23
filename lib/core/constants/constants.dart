@@ -28,6 +28,7 @@ class AppConstants {
   static const String routeAdminAnalytics = '/admin/analytics';
   static const String routeAdminExports = '/admin/exports';
   static const String routeAdminBehaviour = '/admin/behaviour';
+  static const String routeAdminAnnouncements = '/admin/announcements';
   static const String routeTeacher = '/teacher';
   static const String routeTeacherDashboard = '/teacher/dashboard';
   static const String routeTeacherClasses = '/teacher/classes';

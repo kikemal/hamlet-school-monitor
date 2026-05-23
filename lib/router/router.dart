@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/constants.dart';
+import '../features/admin/presentation/screens/admin_announcements_screen.dart';
 import '../features/admin/presentation/screens/admin_behaviour_screen.dart';
 import '../features/admin/presentation/screens/admin_analytics_screen.dart';
 import '../features/admin/presentation/screens/admin_classes_screen.dart';
@@ -120,6 +121,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           _adminBranch(AppConstants.routeAdminClasses, const AdminClassesScreen()),
           _adminBranch(AppConstants.routeAdminFees, const AdminFeesScreen()),
           _adminBranch(AppConstants.routeAdminEvents, const AdminEventsScreen()),
+          _adminBranch(
+            AppConstants.routeAdminAnnouncements,
+            const AdminAnnouncementsScreen(),
+          ),
           _adminBranch(AppConstants.routeAdminDocuments, const AdminDocumentsScreen()),
           _adminBranch(AppConstants.routeAdminAnalytics, const AdminAnalyticsScreen()),
           _adminBranch(AppConstants.routeAdminBehaviour, const AdminBehaviourScreen()),
