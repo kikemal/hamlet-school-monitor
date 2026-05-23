@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../shared/domain/entities/conversation.dart';
 import '../../../shared/domain/entities/message.dart';
@@ -16,11 +17,11 @@ class ParentRepository {
     ParentCalendarService? calendar,
     ParentAnnouncementService? announcements,
     ParentChatService? chat,
-  })  : _dashboard = dashboard ?? ParentDashboardService(),
-        _child = child ?? ParentChildService(),
-        _calendar = calendar ?? ParentCalendarService(),
-        _announcements = announcements ?? ParentAnnouncementService(),
-        _chat = chat ?? ParentChatService();
+  }) : _dashboard = dashboard ?? ParentDashboardService(),
+       _child = child ?? ParentChildService(),
+       _calendar = calendar ?? ParentCalendarService(),
+       _announcements = announcements ?? ParentAnnouncementService(),
+       _chat = chat ?? ParentChatService();
 
   final ParentDashboardService _dashboard;
   final ParentChildService _child;
@@ -58,26 +59,60 @@ class ParentRepository {
   Future<List<EventListItem>> fetchEvents(String schoolId) =>
       _calendar.fetchEvents(schoolId);
 
-  Future<List<SchoolEvent>> fetchEventsForMonth(String schoolId, DateTime month) =>
-      _calendar.fetchEventsForMonth(schoolId, month);
+  Future<List<SchoolEvent>> fetchEventsForMonth(
+    String schoolId,
+    DateTime month,
+  ) => _calendar.fetchEventsForMonth(schoolId, month);
 
   // Announcements
-  Future<List<Announcement>> fetchAnnouncements(String schoolId, {String? classId}) =>
-      _announcements.fetchAnnouncements(schoolId, classId: classId);
+  Future<List<Announcement>> fetchAnnouncements(
+    String schoolId, {
+    String? classId,
+  }) => _announcements.fetchAnnouncements(schoolId, classId: classId);
 
   // Chat
   Future<Profile?> fetchTeacherForStudent(String studentId) =>
       _chat.fetchTeacherForStudent(studentId);
 
-  Future<Conversation> getOrCreateConversation(String parentId, String teacherId) =>
-      _chat.getOrCreateConversation(parentId, teacherId);
+  Future<Conversation> getOrCreateConversation(
+    String parentId,
+    String teacherId,
+  ) => _chat.getOrCreateConversation(parentId, teacherId);
 
   Future<List<Message>> fetchMessages(String conversationId) =>
       _chat.fetchMessages(conversationId);
 
-  Future<Message> sendMessage(String conversationId, String senderId, String content) =>
-      _chat.sendMessage(conversationId, senderId, content);
+  Future<Message> sendMessage(
+    String conversationId,
+    String senderId,
+    String content,
+  ) => _chat.sendMessage(conversationId, senderId, content);
 
-  RealtimeChannel subscribeToMessages(String conversationId, void Function(Message) onMessageReceived) =>
-      _chat.subscribeToMessages(conversationId, onMessageReceived);
+  Future<Message> sendMessageWithImage(
+    String conversationId,
+    String senderId,
+    String content,
+    File imageFile,
+  ) => _chat.sendMessageWithImage(conversationId, senderId, content, imageFile);
+
+  Future<Message> sendMessageWithFile(
+    String conversationId,
+    String senderId,
+    String content,
+    File file,
+  ) => _chat.sendMessageWithFile(conversationId, senderId, content, file);
+
+  Future<void> markMessagesAsRead(String conversationId, String userId) =>
+      _chat.markMessagesAsRead(conversationId, userId);
+
+  Future<int> fetchUnreadCount(String userId) => _chat.fetchUnreadCount(userId);
+
+  Future<List<Map<String, dynamic>>> fetchConversationsWithDetails(
+    String userId,
+  ) => _chat.fetchConversationsWithDetails(userId);
+
+  RealtimeChannel subscribeToMessages(
+    String conversationId,
+    void Function(Message) onMessageReceived,
+  ) => _chat.subscribeToMessages(conversationId, onMessageReceived);
 }

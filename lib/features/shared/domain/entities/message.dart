@@ -11,9 +11,13 @@ abstract class Message with _$Message {
     required String senderId,
     required String content,
     @Default(false) bool isRead,
+    @JsonKey(name: 'file_url') String? fileUrl,
+    @JsonKey(name: 'file_type') String? fileType,
+    @JsonKey(name: 'file_name') String? fileName,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _Message;
 
-  factory Message.fromJson(Map<String, dynamic> json) => _$MessageFromJson(json);
+  factory Message.fromJson(Map<String, dynamic> json) =>
+      _$MessageFromJson(json);
 }

@@ -5,67 +5,51 @@ import '../../../../core/services/storage_service.dart';
 import '../../../shared/domain/entities/conversation.dart';
 import '../../../shared/domain/entities/message.dart';
 import '../../../shared/domain/entities/profile.dart';
-import 'parent_service_base.dart';
+import 'teacher_service_base.dart';
 
-class ParentChatService extends ParentServiceBase {
+class TeacherChatService extends TeacherServiceBase {
   final StorageService _storageService = StorageService();
 
-  /// Fetches the class teacher for a student
-  Future<Profile?> fetchTeacherForStudent(String studentId) async {
+  /// Fetches all parents for a teacher's class
+  Future<List<Profile>> fetchParentsForClass(String classId) async {
     try {
       final response = await SupabaseConfig.client
           .from('students')
           .select('''
-            class_id,
-            school_classes!inner(
-              teacher_id,
-              teachers!inner(
-                specialization,
-                profiles!inner(
-                  id,
-                  role,
-                  first_name,
-                  last_name,
-                  avatar_url,
-                  phone,
-                  created_at,
-                  updated_at
-                )
-              )
+            profiles!inner(
+              id,
+              role,
+              first_name,
+              last_name,
+              avatar_url,
+              phone,
+              created_at,
+              updated_at
             )
           ''')
-          .eq('id', studentId)
-          .maybeSingle();
+          .eq('class_id', classId);
 
-      if (response == null) return null;
+      final parents = <Profile>[];
+      for (var student in response) {
+        final profile = student['profiles'] as Map<String, dynamic>?;
+        if (profile != null && profile['role'] == 'parent') {
+          parents.add(Profile.fromJson(profile));
+        }
+      }
 
-      final schoolClass = response['school_classes'] as Map<String, dynamic>?;
-      if (schoolClass == null) return null;
-
-      final teacher = schoolClass['teachers'] as Map<String, dynamic>?;
-      if (teacher == null) return null;
-
-      final profile = teacher['profiles'] as Map<String, dynamic>?;
-      if (profile == null) return null;
-
-      return Profile.fromJson(profile);
+      return parents;
     } catch (e) {
-      throw Exception('Failed to fetch class teacher: $e');
+      throw Exception('Failed to fetch parents: $e');
     }
   }
 
   /// Retrieves an existing conversation or creates one if it doesn't exist
-  Future<Conversation> getOrCreateConversation(
-    String parentId,
-    String teacherId,
-  ) async {
+  Future<Conversation> getOrCreateConversation(String teacherId, String parentId) async {
     try {
       final response = await SupabaseConfig.client
           .from('conversations')
           .select()
-          .or(
-            'and(participant1_id.eq.$parentId,participant2_id.eq.$teacherId),and(participant1_id.eq.$teacherId,participant2_id.eq.$parentId)',
-          )
+          .or('and(participant1_id.eq.$teacherId,participant2_id.eq.$parentId),and(participant1_id.eq.$parentId,participant2_id.eq.$teacherId)')
           .maybeSingle();
 
       if (response != null) {
@@ -74,7 +58,10 @@ class ParentChatService extends ParentServiceBase {
 
       final insertResponse = await SupabaseConfig.client
           .from('conversations')
-          .insert({'participant1_id': parentId, 'participant2_id': teacherId})
+          .insert({
+            'participant1_id': teacherId,
+            'participant2_id': parentId,
+          })
           .select()
           .single();
 
@@ -100,11 +87,7 @@ class ParentChatService extends ParentServiceBase {
   }
 
   /// Sends a message in a conversation
-  Future<Message> sendMessage(
-    String conversationId,
-    String senderId,
-    String content,
-  ) async {
+  Future<Message> sendMessage(String conversationId, String senderId, String content) async {
     try {
       final response = await SupabaseConfig.client
           .from('messages')
@@ -237,9 +220,7 @@ class ParentChatService extends ParentServiceBase {
   }
 
   /// Fetches all conversations for a user with participant details
-  Future<List<Map<String, dynamic>>> fetchConversationsWithDetails(
-    String userId,
-  ) async {
+  Future<List<Map<String, dynamic>>> fetchConversationsWithDetails(String userId) async {
     try {
       final response = await SupabaseConfig.client
           .from('conversations')
