@@ -19,6 +19,17 @@ import '../features/auth/presentation/providers/auth_provider.dart';
 import '../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
+import '../features/parent/presentation/screens/parent_announcements_screen.dart';
+import '../features/parent/presentation/screens/parent_attendance_screen.dart';
+import '../features/parent/presentation/screens/parent_behaviour_screen.dart';
+import '../features/parent/presentation/screens/parent_calendar_screen.dart';
+import '../features/parent/presentation/screens/parent_chat_screen.dart';
+import '../features/parent/presentation/screens/parent_child_profile_screen.dart';
+import '../features/parent/presentation/screens/parent_dashboard_screen.dart';
+import '../features/parent/presentation/screens/parent_fee_status_screen.dart';
+import '../features/parent/presentation/screens/parent_homework_screen.dart';
+import '../features/parent/presentation/screens/parent_results_screen.dart';
+import '../features/parent/presentation/screens/parent_shell_screen.dart';
 import '../features/teacher/presentation/screens/teacher_analytics_screen.dart';
 import '../features/teacher/presentation/screens/teacher_announcements_screen.dart';
 import '../features/teacher/presentation/screens/teacher_attendance_screen.dart';
@@ -47,6 +58,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (state.matchedLocation == AppConstants.routeTeacher) {
         return AppConstants.routeTeacherDashboard;
       }
+      if (state.matchedLocation == AppConstants.routeParentDashboard) {
+        return AppConstants.routeParentDashboard;
+      }
 
       return RoleGuard.redirect(
         routerState: state,
@@ -74,6 +88,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppConstants.routeStudentDashboard,
         builder: (context, state) => const _RolePlaceholder(title: 'Student Dashboard'),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ParentShellScreen(navigationShell: navigationShell);
+        },
+        branches: [
+          _parentBranch(AppConstants.routeParentDashboard, const ParentDashboardScreen()),
+          _parentBranch(AppConstants.routeParentProfile, const ParentChildProfileScreen()),
+          _parentBranch(AppConstants.routeParentCalendar, const ParentCalendarScreen()),
+          _parentBranch(AppConstants.routeParentAnnouncements, const ParentAnnouncementsScreen()),
+          _parentBranch(AppConstants.routeParentAttendance, const ParentAttendanceScreen()),
+          _parentBranch(AppConstants.routeParentResults, const ParentResultsScreen()),
+          _parentBranch(AppConstants.routeParentHomework, const ParentHomeworkScreen()),
+          _parentBranch(AppConstants.routeParentBehaviour, const ParentBehaviourScreen()),
+          _parentBranch(AppConstants.routeParentFees, const ParentFeeStatusScreen()),
+          _parentBranch(AppConstants.routeParentMessages, const ParentChatScreen()),
+        ],
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -151,6 +182,17 @@ StatefulShellBranch _adminBranch(String path, Widget child) {
 }
 
 StatefulShellBranch _teacherBranch(String path, Widget child) {
+  return StatefulShellBranch(
+    routes: [
+      GoRoute(
+        path: path,
+        pageBuilder: (context, state) => NoTransitionPage(child: child),
+      ),
+    ],
+  );
+}
+
+StatefulShellBranch _parentBranch(String path, Widget child) {
   return StatefulShellBranch(
     routes: [
       GoRoute(

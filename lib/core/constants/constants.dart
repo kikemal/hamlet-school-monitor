@@ -37,7 +37,16 @@ class AppConstants {
   static const String routeTeacherBehaviour = '/teacher/behaviour';
   static const String routeTeacherAnnouncements = '/teacher/announcements';
   static const String routeTeacherAnalytics = '/teacher/analytics';
-  static const String routeParentDashboard = '/parent';
+  static const String routeParentDashboard = '/parent/dashboard';
+  static const String routeParentProfile = '/parent/profile';
+  static const String routeParentCalendar = '/parent/calendar';
+  static const String routeParentAnnouncements = '/parent/announcements';
+  static const String routeParentAttendance = '/parent/attendance';
+  static const String routeParentResults = '/parent/results';
+  static const String routeParentHomework = '/parent/homework';
+  static const String routeParentBehaviour = '/parent/behaviour';
+  static const String routeParentFees = '/parent/fees';
+  static const String routeParentMessages = '/parent/messages';
   static const String routeStudentDashboard = '/student';
 
   // Shared Preferences Keys
