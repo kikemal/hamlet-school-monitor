@@ -30,6 +30,15 @@ import '../features/parent/presentation/screens/parent_fee_status_screen.dart';
 import '../features/parent/presentation/screens/parent_homework_screen.dart';
 import '../features/parent/presentation/screens/parent_results_screen.dart';
 import '../features/parent/presentation/screens/parent_shell_screen.dart';
+import '../features/student/presentation/screens/student_announcements_screen.dart';
+import '../features/student/presentation/screens/student_attendance_screen.dart';
+import '../features/student/presentation/screens/student_calendar_screen.dart';
+import '../features/student/presentation/screens/student_dashboard_screen.dart';
+import '../features/student/presentation/screens/student_homework_screen.dart';
+import '../features/student/presentation/screens/student_profile_screen.dart';
+import '../features/student/presentation/screens/student_results_screen.dart';
+import '../features/student/presentation/screens/student_timetable_screen.dart';
+import '../features/student/presentation/screens/student_shell_screen.dart';
 import '../features/teacher/presentation/screens/teacher_analytics_screen.dart';
 import '../features/teacher/presentation/screens/teacher_announcements_screen.dart';
 import '../features/teacher/presentation/screens/teacher_attendance_screen.dart';
@@ -85,10 +94,38 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppConstants.routeParentDashboard,
         builder: (context, state) => const _RolePlaceholder(title: 'Parent Dashboard'),
       ),
-      GoRoute(
-        path: AppConstants.routeStudentDashboard,
-        builder: (context, state) => const _RolePlaceholder(title: 'Student Dashboard'),
-      ),
+       GoRoute(
+         path: AppConstants.routeStudentDashboard,
+         builder: (context, state) => const _RolePlaceholder(title: 'Student Dashboard'),
+       ),
+       GoRoute(
+         path: AppConstants.routeStudentProfile,
+         builder: (context, state) => const _RolePlaceholder(title: 'Student Profile'),
+       ),
+       GoRoute(
+         path: AppConstants.routeStudentTimetable,
+         builder: (context, state) => const _RolePlaceholder(title: 'Student Timetable'),
+       ),
+       GoRoute(
+         path: AppConstants.routeStudentCalendar,
+         builder: (context, state) => const _RolePlaceholder(title: 'Student Calendar'),
+       ),
+       GoRoute(
+         path: AppConstants.routeStudentAnnouncements,
+         builder: (context, state) => const _RolePlaceholder(title: 'Student Announcements'),
+       ),
+       GoRoute(
+         path: AppConstants.routeStudentAttendance,
+         builder: (context, state) => const _RolePlaceholder(title: 'Student Attendance'),
+       ),
+       GoRoute(
+         path: AppConstants.routeStudentResults,
+         builder: (context, state) => const _RolePlaceholder(title: 'Student Results'),
+       ),
+       GoRoute(
+         path: AppConstants.routeStudentHomework,
+         builder: (context, state) => const _RolePlaceholder(title: 'Student Homework'),
+       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ParentShellScreen(navigationShell: navigationShell);
@@ -123,49 +160,88 @@ final routerProvider = Provider<GoRouter>((ref) {
           _adminBranch(AppConstants.routeAdminExports, const AdminExportsScreen()),
         ],
       ),
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return TeacherShellScreen(navigationShell: navigationShell);
-        },
-        branches: [
-          _teacherBranch(
-            AppConstants.routeTeacherDashboard,
-            const TeacherDashboardScreen(),
-          ),
-          _teacherBranch(
-            AppConstants.routeTeacherClasses,
-            const TeacherClassesScreen(),
-          ),
-          _teacherBranch(
-            AppConstants.routeTeacherTimetable,
-            const TeacherTimetableScreen(),
-          ),
-          _teacherBranch(
-            AppConstants.routeTeacherAttendance,
-            const TeacherAttendanceScreen(),
-          ),
-          _teacherBranch(
-            AppConstants.routeTeacherResults,
-            const TeacherResultsScreen(),
-          ),
-          _teacherBranch(
-            AppConstants.routeTeacherHomework,
-            const TeacherHomeworkScreen(),
-          ),
-          _teacherBranch(
-            AppConstants.routeTeacherBehaviour,
-            const TeacherBehaviourScreen(),
-          ),
-          _teacherBranch(
-            AppConstants.routeTeacherAnnouncements,
-            const TeacherAnnouncementsScreen(),
-          ),
-          _teacherBranch(
-            AppConstants.routeTeacherAnalytics,
-            const TeacherAnalyticsScreen(),
-          ),
-        ],
-      ),
+       StatefulShellRoute.indexedStack(
+         builder: (context, state, navigationShell) {
+           return TeacherShellScreen(navigationShell: navigationShell);
+         },
+         branches: [
+           _teacherBranch(
+             AppConstants.routeTeacherDashboard,
+             const TeacherDashboardScreen(),
+           ),
+           _teacherBranch(
+             AppConstants.routeTeacherClasses,
+             const TeacherClassesScreen(),
+           ),
+           _teacherBranch(
+             AppConstants.routeTeacherTimetable,
+             const TeacherTimetableScreen(),
+           ),
+           _teacherBranch(
+             AppConstants.routeTeacherAttendance,
+             const TeacherAttendanceScreen(),
+           ),
+           _teacherBranch(
+             AppConstants.routeTeacherResults,
+             const TeacherResultsScreen(),
+           ),
+           _teacherBranch(
+             AppConstants.routeTeacherHomework,
+             const TeacherHomeworkScreen(),
+           ),
+           _teacherBranch(
+             AppConstants.routeTeacherBehaviour,
+             const TeacherBehaviourScreen(),
+           ),
+           _teacherBranch(
+             AppConstants.routeTeacherAnnouncements,
+             const TeacherAnnouncementsScreen(),
+           ),
+           _teacherBranch(
+             AppConstants.routeTeacherAnalytics,
+             const TeacherAnalyticsScreen(),
+           ),
+         ],
+       ),
+       StatefulShellRoute.indexedStack(
+         builder: (context, state, navigationShell) {
+           return StudentShellScreen(navigationShell: navigationShell);
+         },
+         branches: [
+           _studentBranch(
+             AppConstants.routeStudentDashboard,
+             const StudentDashboardScreen(),
+           ),
+           _studentBranch(
+             AppConstants.routeStudentProfile,
+             const StudentProfileScreen(),
+           ),
+           _studentBranch(
+             AppConstants.routeStudentTimetable,
+             const StudentTimetableScreen(),
+           ),
+           _studentBranch(
+             AppConstants.routeStudentCalendar,
+             const StudentCalendarScreen(),
+           ),
+           _studentBranch(
+             AppConstants.routeStudentAnnouncements,
+             const StudentAnnouncementsScreen(),
+           ),
+           _studentBranch(
+             AppConstants.routeStudentAttendance,
+             const StudentAttendanceScreen(),
+           ),
+           _studentBranch(
+             AppConstants.routeStudentResults,
+             const StudentResultsScreen(),
+           ),
+           _studentBranch(
+             AppConstants.routeStudentHomework,
+             const StudentHomeworkScreen(),
+           ),
+         ],
+       ),
     ],
   );
 });
@@ -193,6 +269,17 @@ StatefulShellBranch _teacherBranch(String path, Widget child) {
 }
 
 StatefulShellBranch _parentBranch(String path, Widget child) {
+  return StatefulShellBranch(
+    routes: [
+      GoRoute(
+        path: path,
+        pageBuilder: (context, state) => NoTransitionPage(child: child),
+      ),
+    ],
+  );
+}
+
+StatefulShellBranch _studentBranch(String path, Widget child) {
   return StatefulShellBranch(
     routes: [
       GoRoute(

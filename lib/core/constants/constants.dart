@@ -48,6 +48,13 @@ class AppConstants {
   static const String routeParentFees = '/parent/fees';
   static const String routeParentMessages = '/parent/messages';
   static const String routeStudentDashboard = '/student';
+static const String routeStudentProfile = '/student/profile';
+static const String routeStudentTimetable = '/student/timetable';
+static const String routeStudentCalendar = '/student/calendar';
+static const String routeStudentAnnouncements = '/student/announcements';
+static const String routeStudentAttendance = '/student/attendance';
+static const String routeStudentResults = '/student/results';
+static const String routeStudentHomework = '/student/homework';
 
   // Shared Preferences Keys
   static const String keyToken = 'auth_token';
