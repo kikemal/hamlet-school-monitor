@@ -91,6 +91,11 @@ final teacherHomeworkProvider =
   return ref.read(teacherRepositoryProvider).fetchHomework(teacherId);
 });
 
+final teacherHomeworkSubmissionsProvider = FutureProvider.autoDispose
+    .family<List<TeacherHomeworkSubmissionItem>, String>((ref, homeworkId) async {
+  return ref.read(teacherRepositoryProvider).fetchHomeworkSubmissions(homeworkId);
+});
+
 final teacherSubjectsProvider =
     FutureProvider.autoDispose<List<TeacherSubjectOption>>((ref) async {
   final schoolId = ref.watch(teacherSchoolIdProvider).value;

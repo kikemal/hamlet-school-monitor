@@ -54,10 +54,12 @@ class StudentHomeworkWithSubmission {
   const StudentHomeworkWithSubmission({
     required this.homework,
     this.submission,
+    this.subjectName,
   });
 
   final Homework homework;
   final HomeworkSubmission? submission;
+  final String? subjectName;
 
   bool get isSubmitted => submission != null;
   bool get isOverdue =>

@@ -38,16 +38,13 @@ class RoleGuard {
     if (location.startsWith(AppConstants.routeTeacher)) {
       return role == AppConstants.roleTeacher;
     }
-    switch (location) {
-      case AppConstants.routeTeacherDashboard:
-        return role == AppConstants.roleTeacher;
-      case AppConstants.routeParentDashboard:
-        return role == AppConstants.roleParent;
-      case AppConstants.routeStudentDashboard:
-        return role == AppConstants.roleStudent;
-      default:
-        return isPublicRoute(location);
+    if (location.startsWith(AppConstants.routeParent)) {
+      return role == AppConstants.roleParent;
     }
+    if (location.startsWith(AppConstants.routeStudent)) {
+      return role == AppConstants.roleStudent;
+    }
+    return isPublicRoute(location);
   }
 
   /// Central redirect logic: session, expiry, and role enforcement.

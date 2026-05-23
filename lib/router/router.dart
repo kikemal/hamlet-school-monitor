@@ -90,42 +90,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppConstants.routeForgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
-      GoRoute(
-        path: AppConstants.routeParentDashboard,
-        builder: (context, state) => const _RolePlaceholder(title: 'Parent Dashboard'),
-      ),
-       GoRoute(
-         path: AppConstants.routeStudentDashboard,
-         builder: (context, state) => const _RolePlaceholder(title: 'Student Dashboard'),
-       ),
-       GoRoute(
-         path: AppConstants.routeStudentProfile,
-         builder: (context, state) => const _RolePlaceholder(title: 'Student Profile'),
-       ),
-       GoRoute(
-         path: AppConstants.routeStudentTimetable,
-         builder: (context, state) => const _RolePlaceholder(title: 'Student Timetable'),
-       ),
-       GoRoute(
-         path: AppConstants.routeStudentCalendar,
-         builder: (context, state) => const _RolePlaceholder(title: 'Student Calendar'),
-       ),
-       GoRoute(
-         path: AppConstants.routeStudentAnnouncements,
-         builder: (context, state) => const _RolePlaceholder(title: 'Student Announcements'),
-       ),
-       GoRoute(
-         path: AppConstants.routeStudentAttendance,
-         builder: (context, state) => const _RolePlaceholder(title: 'Student Attendance'),
-       ),
-       GoRoute(
-         path: AppConstants.routeStudentResults,
-         builder: (context, state) => const _RolePlaceholder(title: 'Student Results'),
-       ),
-       GoRoute(
-         path: AppConstants.routeStudentHomework,
-         builder: (context, state) => const _RolePlaceholder(title: 'Student Homework'),
-       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ParentShellScreen(navigationShell: navigationShell);

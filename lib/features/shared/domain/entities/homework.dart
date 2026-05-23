@@ -13,6 +13,7 @@ abstract class Homework with _$Homework {
     required String title,
     String? description,
     required DateTime dueDate,
+    @JsonKey(name: 'attachment_url') String? attachmentUrl,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _Homework;

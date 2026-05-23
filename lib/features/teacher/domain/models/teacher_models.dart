@@ -1,6 +1,7 @@
 import '../../../shared/domain/entities/attendance.dart';
 import '../../../shared/domain/entities/behaviour_log.dart';
 import '../../../shared/domain/entities/homework.dart';
+import '../../../shared/domain/entities/homework_submission.dart';
 import '../../../shared/domain/entities/school_class.dart';
 import '../../../shared/domain/entities/timetable.dart';
 
@@ -86,6 +87,17 @@ class TeacherSubjectOption {
 
   final String id;
   final String name;
+}
+
+/// Submission row for teacher grading view.
+class TeacherHomeworkSubmissionItem {
+  const TeacherHomeworkSubmissionItem({
+    required this.submission,
+    required this.studentName,
+  });
+
+  final HomeworkSubmission submission;
+  final String studentName;
 }
 
 /// Homework list item with class/subject labels.

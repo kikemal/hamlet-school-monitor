@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../domain/models/parent_models.dart';
+import '../../../homework/presentation/widgets/homework_card.dart';
 import '../providers/parent_providers.dart';
 import '../widgets/parent_error_view.dart';
 import '../widgets/parent_loading_view.dart';
@@ -16,13 +16,16 @@ class ParentHomeworkScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeworkAsync = ref.watch(childHomeworkProvider);
+    final selectedChild = ref.watch(selectedChildProvider);
 
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
           child: ParentPageHeader(
             title: 'Homework',
-            subtitle: 'View assignments and submissions',
+            subtitle: selectedChild != null
+                ? 'Tracking ${selectedChild!.fullName}\'s assignments'
+                : 'Select a child to view homework',
           ),
         ),
         homeworkAsync.when(
@@ -49,6 +52,7 @@ class ParentHomeworkScreen extends ConsumerWidget {
             }
 
             final pendingCount = homework.where((h) => !h.isSubmitted).length;
+            final overdueCount = homework.where((h) => h.isOverdue).length;
 
             return SliverToBoxAdapter(
               child: Column(
@@ -61,35 +65,20 @@ class ParentHomeworkScreen extends ConsumerWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Column(
-                              children: [
-                                Text(
-                                  '$pendingCount',
-                                  style: AppTypography.h2,
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  'Pending',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                              ],
+                            _SummaryStat(
+                              value: '$pendingCount',
+                              label: 'Pending',
+                              color: Colors.orange,
                             ),
-                            Column(
-                              children: [
-                                Text(
-                                  '${homework.length - pendingCount}',
-                                  style: AppTypography.h2,
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  'Submitted',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                              ],
+                            _SummaryStat(
+                              value: '${homework.length - pendingCount}',
+                              label: 'Submitted',
+                              color: AppColors.success,
+                            ),
+                            _SummaryStat(
+                              value: '$overdueCount',
+                              label: 'Overdue',
+                              color: AppColors.error,
                             ),
                           ],
                         ),
@@ -103,11 +92,11 @@ class ParentHomeworkScreen extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: homework.length,
                       itemBuilder: (context, index) {
-                        final hw = homework[index];
-                        return _buildHomeworkCard(context, hw);
+                        return HomeworkCard.fromParent(homework[index]);
                       },
                     ),
                   ),
+                  SizedBox(height: 24.h),
                 ],
               ),
             );
@@ -116,105 +105,32 @@ class ParentHomeworkScreen extends ConsumerWidget {
       ],
     );
   }
+}
 
-  Widget _buildHomeworkCard(BuildContext context, HomeworkWithSubmission hw) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final status = hw.status;
+class _SummaryStat extends StatelessWidget {
+  const _SummaryStat({
+    required this.value,
+    required this.label,
+    required this.color,
+  });
 
-    Color statusColor;
-    IconData statusIcon;
+  final String value;
+  final String label;
+  final Color color;
 
-    switch (status) {
-      case 'submitted':
-        statusColor = AppColors.success;
-        statusIcon = Icons.check_circle;
-        break;
-      case 'overdue':
-        statusColor = AppColors.error;
-        statusIcon = Icons.warning;
-        break;
-      default:
-        statusColor = Colors.orange;
-        statusIcon = Icons.pending;
-    }
-
-    return Card(
-      margin: EdgeInsets.only(bottom: 12.h),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    hw.homework.title,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(statusIcon, size: 16.w, color: statusColor),
-                      SizedBox(width: 4.w),
-                      Text(
-                        status.toUpperCase(),
-                        style: AppTypography.caption.copyWith(
-                          color: statusColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            if (hw.homework.description != null) ...[
-              SizedBox(height: 8.h),
-              Text(
-                hw.homework.description!,
-                style: AppTypography.bodySmall.copyWith(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
-                ),
-              ),
-            ],
-            SizedBox(height: 12.h),
-            Row(
-              children: [
-                Icon(Icons.calendar_today, size: 16.w, color: AppColors.textSecondaryLight),
-                SizedBox(width: 8.w),
-                Text(
-                  'Due: ${hw.homework.dueDate.day}/${hw.homework.dueDate.month}/${hw.homework.dueDate.year}',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
-            if (hw.isSubmitted && hw.submission != null) ...[
-              SizedBox(height: 8.h),
-              Text(
-                'Submitted on: ${hw.submission!.submittedAt.day}/${hw.submission!.submittedAt.month}/${hw.submission!.submittedAt.year}',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.success,
-                ),
-              ),
-            ],
-          ],
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value, style: AppTypography.h2.copyWith(color: color)),
+        SizedBox(height: 4.h),
+        Text(
+          label,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
         ),
-      ),
+      ],
     );
   }
 }

@@ -1,6 +1,9 @@
 import '../../../shared/domain/entities/announcement.dart';
 import '../../../shared/domain/entities/behaviour_log.dart';
+import 'dart:typed_data';
+
 import '../../../shared/domain/entities/homework.dart';
+import '../../../shared/domain/entities/homework_submission.dart';
 import '../../../shared/domain/entities/result.dart';
 import '../../domain/models/teacher_models.dart';
 import '../services/teacher_analytics_service.dart';
@@ -104,6 +107,8 @@ class TeacherRepository {
     required String title,
     required DateTime dueDate,
     String? description,
+    Uint8List? attachmentBytes,
+    String? attachmentFileName,
   }) =>
       _homework.createHomework(
         classId: classId,
@@ -112,6 +117,8 @@ class TeacherRepository {
         title: title,
         dueDate: dueDate,
         description: description,
+        attachmentBytes: attachmentBytes,
+        attachmentFileName: attachmentFileName,
       );
 
   Future<Homework> updateHomework({
@@ -119,15 +126,33 @@ class TeacherRepository {
     required String title,
     required DateTime dueDate,
     String? description,
+    Uint8List? attachmentBytes,
+    String? attachmentFileName,
   }) =>
       _homework.updateHomework(
         id: id,
         title: title,
         dueDate: dueDate,
         description: description,
+        attachmentBytes: attachmentBytes,
+        attachmentFileName: attachmentFileName,
       );
 
   Future<void> deleteHomework(String id) => _homework.deleteHomework(id);
+
+  Future<List<TeacherHomeworkSubmissionItem>> fetchHomeworkSubmissions(
+    String homeworkId,
+  ) =>
+      _homework.fetchSubmissions(homeworkId);
+
+  Future<HomeworkSubmission> gradeHomeworkSubmission({
+    required String submissionId,
+    required double gradedMarks,
+  }) =>
+      _homework.gradeSubmission(
+        submissionId: submissionId,
+        gradedMarks: gradedMarks,
+      );
 
   Future<List<TeacherBehaviourItem>> fetchBehaviourForClass(String classId) =>
       _behaviour.fetchForClass(classId);

@@ -14,6 +14,7 @@ _Homework _$HomeworkFromJson(Map<String, dynamic> json) => _Homework(
   title: json['title'] as String,
   description: json['description'] as String?,
   dueDate: DateTime.parse(json['due_date'] as String),
+  attachmentUrl: json['attachment_url'] as String?,
   createdAt: json['created_at'] == null
       ? null
       : DateTime.parse(json['created_at'] as String),
@@ -30,6 +31,7 @@ Map<String, dynamic> _$HomeworkToJson(_Homework instance) => <String, dynamic>{
   'title': instance.title,
   'description': instance.description,
   'due_date': instance.dueDate.toIso8601String(),
+  'attachment_url': instance.attachmentUrl,
   'created_at': instance.createdAt?.toIso8601String(),
   'updated_at': instance.updatedAt?.toIso8601String(),
 };

@@ -8,6 +8,7 @@ import 'core/services/push_notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/startup_error_app.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
+import 'features/homework/presentation/providers/homework_realtime_provider.dart';
 import 'router/router.dart';
 
 Future<void> main() async {
@@ -44,6 +45,9 @@ class HamletSchoolApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final goRouter = ref.watch(routerProvider);
+
+    ref.watch(studentHomeworkRealtimeProvider);
+    ref.watch(parentHomeworkRealtimeProvider);
 
     // Reactively listen to authentication state changes to subscribe/unsubscribe to push notifications
     ref.listen(authProvider, (previous, next) {

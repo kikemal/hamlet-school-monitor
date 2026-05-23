@@ -37,7 +37,8 @@ class AppConstants {
   static const String routeTeacherBehaviour = '/teacher/behaviour';
   static const String routeTeacherAnnouncements = '/teacher/announcements';
   static const String routeTeacherAnalytics = '/teacher/analytics';
-static const String routeTeacherAttendanceAnalytics = '/teacher/attendance-analytics';
+  static const String routeTeacherAttendanceAnalytics = '/teacher/attendance-analytics';
+  static const String routeParent = '/parent';
   static const String routeParentDashboard = '/parent/dashboard';
   static const String routeParentProfile = '/parent/profile';
   static const String routeParentCalendar = '/parent/calendar';
@@ -48,14 +49,15 @@ static const String routeTeacherAttendanceAnalytics = '/teacher/attendance-analy
   static const String routeParentBehaviour = '/parent/behaviour';
   static const String routeParentFees = '/parent/fees';
   static const String routeParentMessages = '/parent/messages';
+  static const String routeStudent = '/student';
   static const String routeStudentDashboard = '/student';
-static const String routeStudentProfile = '/student/profile';
-static const String routeStudentTimetable = '/student/timetable';
-static const String routeStudentCalendar = '/student/calendar';
-static const String routeStudentAnnouncements = '/student/announcements';
-static const String routeStudentAttendance = '/student/attendance';
-static const String routeStudentResults = '/student/results';
-static const String routeStudentHomework = '/student/homework';
+  static const String routeStudentProfile = '/student/profile';
+  static const String routeStudentTimetable = '/student/timetable';
+  static const String routeStudentCalendar = '/student/calendar';
+  static const String routeStudentAnnouncements = '/student/announcements';
+  static const String routeStudentAttendance = '/student/attendance';
+  static const String routeStudentResults = '/student/results';
+  static const String routeStudentHomework = '/student/homework';
 
   // Shared Preferences Keys
   static const String keyToken = 'auth_token';

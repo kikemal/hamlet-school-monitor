@@ -3,14 +3,21 @@ import '../../../shared/domain/entities/conversation.dart';
 import '../../../shared/domain/entities/message.dart';
 import '../../../shared/domain/entities/profile.dart';
 import '../../domain/models/student_models.dart';
+import 'dart:typed_data';
+
+import '../../../shared/domain/entities/homework_submission.dart';
 import '../services/student_dashboard_service.dart';
+import '../services/student_homework_service.dart';
 
 class StudentRepository {
   StudentRepository({
     StudentDashboardService? dashboard,
-  })  : _dashboard = dashboard ?? StudentDashboardService();
+    StudentHomeworkService? homework,
+  })  : _dashboard = dashboard ?? StudentDashboardService(),
+        _homework = homework ?? StudentHomeworkService();
 
   final StudentDashboardService _dashboard;
+  final StudentHomeworkService _homework;
 
   // Dashboard
   Future<Student> fetchStudentProfile(String studentId) =>
@@ -20,7 +27,25 @@ class StudentRepository {
       _dashboard.fetchTimetable(studentId);
 
   Future<List<StudentHomeworkWithSubmission>> fetchHomework(String studentId) =>
-      _dashboard.fetchHomework(studentId);
+      _homework.fetchHomework(studentId);
+
+  Future<List<String>> fetchSubmittedHomeworkIds(String studentId) =>
+      _homework.fetchSubmittedHomeworkIds(studentId);
+
+  Future<HomeworkSubmission> submitHomework({
+    required String homeworkId,
+    required String studentId,
+    String? submissionText,
+    Uint8List? fileBytes,
+    String? fileName,
+  }) =>
+      _homework.submitHomework(
+        homeworkId: homeworkId,
+        studentId: studentId,
+        submissionText: submissionText,
+        fileBytes: fileBytes,
+        fileName: fileName,
+      );
 
   Future<List<StudentResultWithDetails>> fetchExamResults(String studentId) =>
       _dashboard.fetchExamResults(studentId);

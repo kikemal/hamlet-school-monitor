@@ -1,12 +1,17 @@
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../homework/presentation/widgets/homework_card.dart';
+import '../../domain/models/student_models.dart';
 import '../providers/student_providers.dart';
 import '../widgets/student_error_view.dart';
 import '../widgets/student_loading_view.dart';
 import '../widgets/student_page_header.dart';
-import '../../domain/models/student_models.dart';
 
 class StudentHomeworkScreen extends ConsumerWidget {
   const StudentHomeworkScreen({super.key});
@@ -14,16 +19,15 @@ class StudentHomeworkScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeworkAsync = ref.watch(studentHomeworkProvider);
-    final studentAsync = ref.watch(studentProfileProvider);
 
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
           child: StudentPageHeader(
             title: 'Homework',
-            subtitle: 'View assignments and submissions',
+            subtitle: 'View assignments and submit your work',
           ),
-        ],
+        ),
         homeworkAsync.when(
           loading: () => const SliverToBoxAdapter(child: StudentLoadingView()),
           error: (e, _) => SliverToBoxAdapter(
@@ -39,7 +43,7 @@ class StudentHomeworkScreen extends ConsumerWidget {
                   padding: EdgeInsets.all(20.w),
                   child: Center(
                     child: Text(
-                      'No homework found',
+                      'No homework assigned',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
@@ -47,7 +51,8 @@ class StudentHomeworkScreen extends ConsumerWidget {
               );
             }
 
-            final pendingCount = homeworkList.where((h) => !h.isSubmitted).length;
+            final pendingCount =
+                homeworkList.where((h) => !h.isSubmitted).length;
 
             return SliverToBoxAdapter(
               child: Column(
@@ -60,39 +65,13 @@ class StudentHomeworkScreen extends ConsumerWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Column(
-                              children: [
-                                Text(
-                                  '$pendingCount',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontSize: 24.sp,
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  'Pending',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
+                            _StatColumn(
+                              label: 'Pending',
+                              value: '$pendingCount',
                             ),
-                            Column(
-                              children: [
-                                Text(
-                                  '${homeworkList.length - pendingCount}',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontSize: 24.sp,
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  'Submitted',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
+                            _StatColumn(
+                              label: 'Submitted',
+                              value: '${homeworkList.length - pendingCount}',
                             ),
                           ],
                         ),
@@ -106,11 +85,22 @@ class StudentHomeworkScreen extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: homeworkList.length,
                       itemBuilder: (context, index) {
-                        final homework = homeworkList[index];
-                        return _buildHomeworkCard(context, homework);
+                        final hw = homeworkList[index];
+                        return HomeworkCard.fromStudent(
+                          hw,
+                          onTap: () => _openDetail(context, ref, hw),
+                          trailing: hw.isSubmitted
+                              ? null
+                              : FilledButton.tonal(
+                                  onPressed: () =>
+                                      _showSubmitDialog(context, ref, hw),
+                                  child: const Text('Submit'),
+                                ),
+                        );
                       },
                     ),
                   ),
+                  SizedBox(height: 24.h),
                 ],
               ),
             );
@@ -120,113 +110,142 @@ class StudentHomeworkScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHomeworkCard(BuildContext context, StudentHomeworkWithSubmission hw) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final status = hw.status;
-
-    Color statusColor;
-    IconData statusIcon;
-
-    switch (status) {
-      case 'submitted':
-        statusColor = Theme.of(context).colorScheme.primary;
-        statusIcon = Icons.check_circle;
-        break;
-      case 'overdue':
-        statusColor = Theme.of(context).colorScheme.error;
-        statusIcon = Icons.warning;
-        break;
-      default:
-        statusColor = Theme.of(context).colorScheme.secondary;
-        statusIcon = Icons.pending;
+  void _openDetail(
+    BuildContext context,
+    WidgetRef ref,
+    StudentHomeworkWithSubmission hw,
+  ) {
+    if (!hw.isSubmitted) {
+      _showSubmitDialog(context, ref, hw);
+      return;
     }
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: HomeworkCard.fromStudent(hw),
+      ),
+    );
+  }
 
-    return Card(
-      margin: EdgeInsets.only(bottom: 12.h),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Future<void> _showSubmitDialog(
+    BuildContext context,
+    WidgetRef ref,
+    StudentHomeworkWithSubmission hw,
+  ) async {
+    final auth = ref.read(authProvider);
+    final studentId = auth.profile?.id;
+    if (studentId == null) return;
+
+    final textCtrl = TextEditingController();
+    Uint8List? fileBytes;
+    String? fileName;
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text('Submit — ${hw.homework.title}'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Text(
-                    hw.homework.title,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                TextField(
+                  controller: textCtrl,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    labelText: 'Your answer',
+                    border: OutlineInputBorder(),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(statusIcon, size: 16.w, color: statusColor),
-                      SizedBox(width: 4.w),
-                      Text(
-                        status.toUpperCase(),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: statusColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.upload_file),
+                  title: Text(fileName ?? 'Attach file (optional)'),
+                  onTap: () async {
+                    final result = await FilePicker.platform.pickFiles(
+                      withData: true,
+                    );
+                    if (result != null && result.files.single.bytes != null) {
+                      setState(() {
+                        fileBytes = result.files.single.bytes;
+                        fileName = result.files.single.name;
+                      });
+                    }
+                  },
                 ),
               ],
             ),
-            if (hw.homework.description != null) ...[
-              SizedBox(height: 8.h),
-              Text(
-                hw.homework.description!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: isDark
-                      ? Theme.of(context).colorScheme.onSurfaceVariant
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-            SizedBox(height: 12.h),
-            Row(
-              children: [
-                Icon(Icons.calendar_today, size: 16.w, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                SizedBox(width: 8.w),
-                Text(
-                  'Due: ${hw.homework.dueDate.day}/${hw.homework.dueDate.month}/${hw.homework.dueDate.year}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
             ),
-            if (hw.isSubmitted && hw.submission != null) ...[
-              SizedBox(height: 8.h),
-              Text(
-                'Submitted on: ${hw.submission!.submittedAt.day}/${hw.submission!.submittedAt.month}/${hw.submission!.submittedAt.year}',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              if (hw.submission!.grade != null) ...[
-                SizedBox(height: 4.h),
-                Text(
-                  'Grade: ${hw.submission!.grade!.toStringAsFixed(1)}',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ],
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Submit'),
+            ),
           ],
         ),
       ),
+    );
+
+    if (ok != true) {
+      textCtrl.dispose();
+      return;
+    }
+
+    try {
+      await ref.read(studentRepositoryProvider).submitHomework(
+            homeworkId: hw.homework.id,
+            studentId: studentId,
+            submissionText: textCtrl.text.trim().isEmpty ? null : textCtrl.text.trim(),
+            fileBytes: fileBytes,
+            fileName: fileName,
+          );
+      ref.invalidate(studentHomeworkProvider);
+      studentInvalidateAll(ref);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Homework submitted')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    } finally {
+      textCtrl.dispose();
+    }
+  }
+}
+
+class _StatColumn extends StatelessWidget {
+  const _StatColumn({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24.sp),
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+      ],
     );
   }
 }

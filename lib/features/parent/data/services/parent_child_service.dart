@@ -148,10 +148,10 @@ class ParentChildService extends ParentServiceBase {
 
       final homeworkResponse = await SupabaseConfig.client
           .from('homework')
-          .select()
+          .select('*, subjects(name)')
           .eq('class_id', classId)
           .order('due_date', ascending: false)
-          .limit(20);
+          .limit(50);
 
       final homeworkList = <HomeworkWithSubmission>[];
       for (final hw in homeworkResponse) {
