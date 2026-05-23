@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Hamlet School (Chrome + Supabase)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "-d",
+        "chrome",
+        "--dart-define=SUPABASE_URL=PASTE_YOUR_SUPABASE_URL_HERE",
+        "--dart-define=SUPABASE_ANON_KEY=PASTE_YOUR_ANON_KEY_HERE"
+      ]
+    }
+  ]
+}
